@@ -11,6 +11,7 @@
     *{box-sizing:border-box}
     html,body{height:100%;margin:0;overflow:hidden;font-family:"EB Garamond",serif;background:#0c0a09;color:#111}
 
+
     #stage{position:fixed;inset:0;display:grid;place-items:center}
     .aurora{position:absolute;inset:0;
       background: radial-gradient(1200px 800px at 20% 30%, #ffecd2 0%, transparent 60%),
@@ -24,6 +25,7 @@
     /* Two network layers are in same container to preserve single visual area */
     #mynetwork{position:absolute;inset:0;box-shadow:inset 0 0 120px rgba(0,0,0,.6);cursor:grab}
     #mynetwork:active{cursor:grabbing}
+
 
     /* Overlay (glass) */
     #overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:6vh 5vw;z-index:30;
@@ -39,6 +41,7 @@
     .notes{margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,224,196,.4);font-size:clamp(16px,2vw,20px);color:rgba(255,243,230,.92);line-height:1.6;white-space:pre-wrap}
     .hint{position:fixed;bottom:18px;left:18px;z-index:40;font-size:14px;color:rgba(255,236,214,.9);background:rgba(20,16,14,.45);border:1px solid rgba(217,166,115,.4);border-radius:999px;padding:8px 12px;pointer-events:none}
 
+
     /* Editor panel (kept) */
     .editor-panel{position:fixed;top:18px;right:18px;z-index:50;display:flex;flex-direction:column;gap:12px;padding:14px 18px;max-width:min(420px,92vw);background:rgba(18,14,12,.78);border:1px solid rgba(217,166,115,.4);border-radius:16px;box-shadow:0 12px 45px rgba(0,0,0,.4);backdrop-filter:blur(10px) saturate(120%)}
     .editor-panel h2{font-size:18px;margin-bottom:6px;color:#ffe7c7}
@@ -48,6 +51,7 @@
     .editor-panel .panel-content{display:none;flex-direction:column;gap:14px;max-height:70vh;overflow-y:auto;padding-right:4px}
     .editor-panel .panel-content.active{display:flex}
     .editor-panel .message{font-size:13px;color:rgba(255,236,214,.9);margin-top:4px}
+
 
     /* small responsive tweaks */
     @media (max-width:720px){.card{padding:18px}}
@@ -65,6 +69,7 @@
         <div class="message">Crear nodo en la constelación seleccionada.</div>
       </div>
 
+
       <div class="section">
         <h2>Editar nodo</h2>
         <p class="message" id="selectionMessage">Selecciona un nodo para editarlo.</p>
@@ -74,6 +79,14 @@
         <textarea id="nodeInfo" placeholder="Texto del nodo"></textarea>
         <label for="nodeNotes">Notas (visible en ficha)</label>
         <textarea id="nodeNotes" placeholder="Notas adicionales"></textarea>
+        <label for="nodeImage">Imagen (URL o base64)</label>
+        <input id="nodeImage" type="text" placeholder="https://... o data:image/png;base64,..." />
+        <label for="nodeAudio">Audio (URL)</label>
+        <input id="nodeAudio" type="text" placeholder="https://..." />
+        <label for="nodeVideo">Video (URL)</label>
+        <input id="nodeVideo" type="text" placeholder="https://..." />
+        <label for="nodeLink">Enlace externo</label>
+        <input id="nodeLink" type="text" placeholder="https://..." />
         <label><input id="nodePhysics" type="checkbox" /> Afectado por física (inercia/tensión)</label>
         <label><input id="nodeFixed" type="checkbox" /> Bloqueado (no se mueve)</label>
         <div style="display:flex;gap:8px;">
@@ -82,6 +95,7 @@
         </div>
         <p class="message" id="nodeMessage"></p>
       </div>
+
 
       <div class="section">
         <h2>Conexiones</h2>
@@ -93,6 +107,7 @@
         <p class="message" id="connectionMessage"></p>
       </div>
 
+
       <div class="section">
         <h2>Nuevo nodo</h2>
         <label for="newNodeLabel">Título</label>
@@ -101,6 +116,14 @@
         <textarea id="newNodeInfo" placeholder="Texto del nuevo nodo"></textarea>
         <label for="newNodeNotes">Notas (opcional)</label>
         <textarea id="newNodeNotes" placeholder="Notas para la ficha"></textarea>
+        <label for="newNodeImage">Imagen (URL o base64)</label>
+        <input id="newNodeImage" type="text" placeholder="https://... o data:image/png;base64,..." />
+        <label for="newNodeAudio">Audio (URL)</label>
+        <input id="newNodeAudio" type="text" placeholder="https://..." />
+        <label for="newNodeVideo">Video (URL)</label>
+        <input id="newNodeVideo" type="text" placeholder="https://..." />
+        <label for="newNodeLink">Enlace externo</label>
+        <input id="newNodeLink" type="text" placeholder="https://..." />
         <label for="newNodePhysics"><input id="newNodePhysics" type="checkbox" /> Afectado por física</label>
         <label for="newNodeFixed"><input id="newNodeFixed" type="checkbox" /> Bloqueado</label>
         <div style="display:flex;gap:8px;">
@@ -109,6 +132,7 @@
         </div>
         <p class="message" id="createMessage"></p>
       </div>
+
 
       <div class="section">
         <h2>Guardar / Reset</h2>
@@ -122,6 +146,7 @@
     </div>
   </div>
 
+
   <!-- Stage -->
   <div id="stage">
     <div class="aurora" aria-hidden="true"></div>
@@ -130,13 +155,15 @@
     <div class="dim-overlay" id="dim"></div>
   </div>
 
+
   <!-- Overlay card -->
   <div id="overlay" aria-hidden="true">
     <article class="card" id="card">
-      <button class="close" id="closeBtn" aria-label="Cerrar">✕</button>
-      <h1 class="title" id="title"></h1>
-      <img src="portada.jpg" alt="Portada" class="media" />
-      <div class="text" id="text"></div>
+  <button class="close" id="closeBtn" aria-label="Cerrar">✕</button>
+  <h1 class="title" id="title"></h1>
+  <div id="mediaContainer"></div>
+  <div class="text" id="text"></div>
+
 
       <label style="margin-top:12px;color:#ffe7c7">Editar notas</label>
       <textarea id="notesInput" style="width:100%;min-height:120px;margin-top:8px;border-radius:10px;padding:10px;background:rgba(255,248,240,0.06);color:#fff6eb"></textarea>
@@ -145,26 +172,34 @@
         <button id="closeOverlayBtn" class="close">Cerrar</button>
       </div>
 
+
       <div class="notes" id="notes" hidden></div>
     </article>
   </div>
 
+
   <div class="hint">clic en un nodo · rueda para zoom · arrastrar para mover</div>
 
+
   <script>
-  /*****************************************************************
-   *  Constelaciones mejoradas (single vis.Network) - explicación:
-   *  - Usamos una sola vis.Network para evitar conflictos de clicks/overlay.
-   *  - Cada nodo tiene propiedad `constellation` para agrupar.
-   *  - Cuando se crea nodo en otra constelación, lo ubicamos con un offset X grande
-   *    para separarlo visualmente y evitar "atracción" inmediata.
-   *  - Motor: barnesHut con parámetros para movimiento "estelar".
-   *  - Cada nodo puede tener `physics: true/false` y `fixed` para controlar inercia.
-   *****************************************************************/
+  document.addEventListener("DOMContentLoaded", function() {
+  // Declare connectMode at the top so it is available everywhere
+  let connectMode = { active: false, remove: false, source: null };
+    /*****************************************************************
+     *  Constelaciones mejoradas (single vis.Network) - explicación:
+     *  - Usamos una sola vis.Network para evitar conflictos de clicks/overlay.
+     *  - Cada nodo tiene propiedad `constellation` para agrupar.
+     *  - Cuando se crea nodo en otra constelación, lo ubicamos con un offset X grande
+     *    para separarlo visualmente y evitar "atracción" inmediata.
+     *  - Motor: barnesHut con parámetros para movimiento "estelar".
+     *  - Cada nodo puede tener `physics: true/false` y `fixed` para controlar inercia.
+     *****************************************************************/
+
 
   // ---------- DATOS INICIALES (recuperados del original) ----------
   const initialConfs = ["Camila Sosa Villada", "Travestismo Cuántico"];
   let STORAGE_KEY = "camila_vanguardia_graph_v4";
+
 
   // original nodes (kept main texts). I keep same IDs for backward compatibility.
   let nodes_data = [
@@ -176,6 +211,7 @@
     { id: 7, label: "Bitácora", info: `Terminé, una parte. Ahora queda realizar un trenzado...`, constellation: "Camila Sosa Villada" }
   ];
 
+
   let edges_data = [
     { from: 1, to: 2 },
     { from: 1, to: 3 },
@@ -185,6 +221,7 @@
     { from: 3, to: 4 },
     { from: 2, to: 3 }
   ];
+
 
   // ---------- util: load saved state ----------
   function loadState() {
@@ -198,6 +235,7 @@
     }
   }
 
+
   function saveState(payload) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -205,6 +243,7 @@
       console.warn("No se pudo guardar estado:", e);
     }
   }
+
 
   // ---------- datasets (vis) ----------
   // each node will have: id, label, info, notes, constellation, physics (true/false), fixed (object or false), x,y optional
@@ -220,6 +259,7 @@
     nodes_data = nodes_data.map(n => ({ ...n, constellation: n.constellation || initialConfs[0], physics: true }));
   }
 
+
   const container = document.getElementById("mynetwork");
   const nodes = new vis.DataSet(nodes_data.map(n => {
     // convert fixed boolean to vis format
@@ -228,6 +268,7 @@
     return copy;
   }));
   const edges = new vis.DataSet(edges_data);
+
 
   // ---------- funzione per posizionare initial nodes in groups ----------
   // If node has no x,y, place nodes of second constelation offset to right for separation.
@@ -255,8 +296,10 @@
     });
   }
 
+
   // Call now to set positions for newly created nodes if needed
   ensureGroupSeparation();
+
 
   // ---------- network options (barnesHut tuned) ----------
   const options = {
@@ -304,7 +347,9 @@
     layout: { improvedLayout: false }
   };
 
+
   const network = new vis.Network(container, { nodes, edges }, options);
+
 
   /***********************
    * Persistence helpers *
@@ -324,12 +369,14 @@
     saveState(payload);
   }
 
+
   // Save on changes
   nodes.on("add", persistAll);
   nodes.on("update", persistAll);
   nodes.on("remove", persistAll);
   edges.on("add", persistAll);
   edges.on("remove", persistAll);
+
 
   // Also save after drag end positions
   network.on("dragEnd", params => {
@@ -344,6 +391,7 @@
     }
   });
 
+
   // ---------- Glow idle (gentle) ----------
   let pulse = 0;
   setInterval(() => {
@@ -352,10 +400,12 @@
     network.setOptions({ nodes: { ...options.nodes, size: factor } });
   }, 90);
 
+
   // ---------- UI wiring ----------
   const toggleEditorBtn = document.getElementById("toggleEditor");
   const editorContent = document.getElementById("editorContent");
   const constellationSelect = document.getElementById("constellationSelect");
+
 
   // node edit fields
   const nodeLabelInput = document.getElementById("nodeLabel");
@@ -368,6 +418,23 @@
   const deleteNodeBtn = document.getElementById("deleteNode");
   const nodeMessage = document.getElementById("nodeMessage");
 
+
+  const nodeImageInput = document.getElementById("nodeImage");
+  const nodeAudioInput = document.getElementById("nodeAudio");
+  const nodeVideoInput = document.getElementById("nodeVideo");
+  const nodeLinkInput = document.getElementById("nodeLink");
+
+
+  const newNodeImageInput = document.getElementById("newNodeImage");
+  const newNodeAudioInput = document.getElementById("newNodeAudio");
+  const newNodeVideoInput = document.getElementById("newNodeVideo");
+  const newNodeLinkInput = document.getElementById("newNodeLink");
+
+
+  const mediaContainer = document.getElementById("mediaContainer");
+ 
+
+
   // create fields
   const newNodeLabelInput = document.getElementById("newNodeLabel");
   const newNodeInfoInput = document.getElementById("newNodeInfo");
@@ -378,10 +445,12 @@
   const newConstBtn = document.getElementById("newConstellation");
   const createMessage = document.getElementById("createMessage");
 
+
   // connection
   const addConnectionBtn = document.getElementById("addConnection");
   const removeConnectionBtn = document.getElementById("removeConnection");
   const connectionMessage = document.getElementById("connectionMessage");
+
 
   // overlay elements
   const overlay = document.getElementById("overlay");
@@ -393,17 +462,20 @@
   const closeOverlayBtn = document.getElementById("closeOverlayBtn");
   const closeBtn = document.getElementById("closeBtn");
 
+
   // export/import/reset
   const exportBtn = document.getElementById("exportJSON");
   const importBtn = document.getElementById("importJSON");
   const resetBtn = document.getElementById("resetBtn");
   const storageMessage = document.getElementById("storageMessage");
 
+
   // hint toggles
   toggleEditorBtn.addEventListener("click", () => {
     const active = editorContent.classList.toggle("active");
     toggleEditorBtn.setAttribute("aria-expanded", active ? "true" : "false");
   });
+
 
   // populate constellation select with existing groups from nodes and initial ones
   function refreshConstellationOptions() {
@@ -420,32 +492,43 @@
   }
   refreshConstellationOptions();
 
+
   // selection state
   let activeNodeId = null;
 
-  function updateEditorForSelection(nodeId) {
-    if (!nodeId) {
-      selectionMessage.textContent = "Selecciona un nodo para editarlo.";
-      nodeLabelInput.value = "";
-      nodeInfoInput.value = "";
-      nodeNotesInput.value = "";
-      nodePhysicsInput.checked = true;
-      nodeFixedInput.checked = false;
-      saveNodeBtn.disabled = true;
-      deleteNodeBtn.disabled = true;
-      return;
-    }
-    const n = nodes.get(nodeId);
-    activeNodeId = nodeId;
-    selectionMessage.textContent = `Editando nodo ID ${nodeId}`;
-    nodeLabelInput.value = n.label || "";
-    nodeInfoInput.value = n.info || "";
-    nodeNotesInput.value = n.notes || "";
-    nodePhysicsInput.checked = (n.physics !== false);
-    nodeFixedInput.checked = !!(n.fixed && (n.fixed.x === true || n.fixed === true));
-    saveNodeBtn.disabled = false;
-    deleteNodeBtn.disabled = false;
+
+function updateEditorForSelection(nodeId) {
+  if (!nodeId) {
+    selectionMessage.textContent = "Selecciona un nodo para editarlo.";
+    nodeLabelInput.value = "";
+    nodeInfoInput.value = "";
+    nodeNotesInput.value = "";
+    nodeImageInput.value = "";
+    nodeAudioInput.value = "";
+    nodeVideoInput.value = "";
+    nodeLinkInput.value = "";
+    nodePhysicsInput.checked = true;
+    nodeFixedInput.checked = false;
+    saveNodeBtn.disabled = true;
+    deleteNodeBtn.disabled = true;
+    return;
   }
+  const n = nodes.get(nodeId);
+  activeNodeId = nodeId;
+  selectionMessage.textContent = `Editando nodo ID ${nodeId}`;
+  nodeLabelInput.value = n.label || "";
+  nodeInfoInput.value = n.info || "";
+  nodeNotesInput.value = n.notes || "";
+  nodeImageInput.value = n.image || "";
+  nodeAudioInput.value = n.audio || "";
+  nodeVideoInput.value = n.video || "";
+  nodeLinkInput.value = n.link || "";
+  nodePhysicsInput.checked = (n.physics !== false);
+  nodeFixedInput.checked = !!(n.fixed && (n.fixed.x === true || n.fixed === true));
+  saveNodeBtn.disabled = false;
+  deleteNodeBtn.disabled = false;
+}
+
 
   network.on("selectNode", params => {
     const nodeId = params.nodes[0];
@@ -456,30 +539,37 @@
     }
   });
 
-  saveNodeBtn.addEventListener("click", () => {
-    if (!activeNodeId) return;
-    const label = nodeLabelInput.value.trim();
-    const info = nodeInfoInput.value.trim();
-    if (!label || !info) { nodeMessage.textContent = "Completa título y descripción"; setTimeout(()=>nodeMessage.textContent="",2200); return; }
-    const notes = nodeNotesInput.value.trim();
-    const physics = nodePhysicsInput.checked;
-    const fixedChecked = nodeFixedInput.checked;
 
-    const update = { id: activeNodeId, label, info, notes, physics };
-    if (fixedChecked) {
-      // get position and fix there
-      const pos = network.getPositions([activeNodeId])[activeNodeId];
-      update.fixed = { x: true, y: true };
-      update.x = pos.x; update.y = pos.y;
-    } else {
-      update.fixed = false;
-      // leave x,y as they are (they'll be used by physics)
-    }
-    nodes.update(update);
-    persistAll();
-    nodeMessage.textContent = "Nodo guardado ✓";
-    setTimeout(()=>nodeMessage.textContent="",1500);
-  });
+saveNodeBtn.addEventListener("click", () => {
+  if (!activeNodeId) return;
+  const label = nodeLabelInput.value.trim();
+  const info = nodeInfoInput.value.trim();
+  if (!label || !info) { nodeMessage.textContent = "Completa título y descripción"; setTimeout(()=>nodeMessage.textContent="",2200); return; }
+  const notes = nodeNotesInput.value.trim();
+  const image = nodeImageInput.value.trim();
+  const audio = nodeAudioInput.value.trim();
+  const video = nodeVideoInput.value.trim();
+  const link = nodeLinkInput.value.trim();
+  const physics = nodePhysicsInput.checked;
+  const fixedChecked = nodeFixedInput.checked;
+
+
+  const update = { id: activeNodeId, label, info, notes, image, audio, video, link, physics };
+  if (fixedChecked) {
+    // get position and fix there
+    const pos = network.getPositions([activeNodeId])[activeNodeId];
+    update.fixed = { x: true, y: true };
+    update.x = pos.x; update.y = pos.y;
+  } else {
+    update.fixed = false;
+    // leave x,y as they are (they'll be used by physics)
+  }
+  nodes.update(update);
+  persistAll();
+  nodeMessage.textContent = "Nodo guardado ✓";
+  setTimeout(()=>nodeMessage.textContent="",1500);
+});
+
 
   deleteNodeBtn.addEventListener("click", () => {
     if (!activeNodeId) return;
@@ -491,32 +581,97 @@
     updateEditorForSelection(null);
   });
 
+
   // ---------- Overlay open/close and editing notes ----------
   let overlayNodeId = null;
-  function openOverlay(nodeId, pointer) {
-    const n = nodes.get(nodeId);
-    if (!n) return;
-    overlayNodeId = nodeId;
-    titleEl.textContent = n.label || "";
-    textEl.textContent = n.info || "";
-    notesInput.value = n.notes || "";
-    notesEl.textContent = n.notes || "";
-    notesEl.hidden = !n.notes;
-    // set spotlight coords
-    if (pointer) {
-      document.getElementById("dim").style.setProperty("--x", pointer.x + "px");
-      document.getElementById("dim").style.setProperty("--y", pointer.y + "px");
-    }
-    document.getElementById("dim").classList.add("show");
-    overlay.style.display = "flex";
-    overlay.setAttribute("aria-hidden","false");
+function openOverlay(nodeId, pointer) {
+  const n = nodes.get(nodeId);
+  if (!n) return;
+  overlayNodeId = nodeId;
+  titleEl.textContent = n.label || "";
+  textEl.textContent = n.info || "";
+  notesInput.value = n.notes || "";
+  notesEl.textContent = n.notes || "";
+  notesEl.hidden = !n.notes;
+  // Render media
+  mediaContainer.innerHTML = "";
+  if (n.image) {
+    const img = document.createElement("img");
+    img.src = n.image;
+    img.alt = n.label || "Imagen";
+    img.className = "media";
+    img.style.maxWidth = "320px";
+    img.style.marginBottom = "10px";
+    mediaContainer.appendChild(img);
   }
+  if (n.audio) {
+    const audio = document.createElement("audio");
+    audio.src = n.audio;
+    audio.controls = true;
+    audio.style.display = "block";
+    audio.style.margin = "10px 0";
+    mediaContainer.appendChild(audio);
+  }
+  if (n.video) {
+    // YouTube embed support
+    const ytMatch = n.video.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/))([\w-]{11})/);
+    if (ytMatch) {
+      const iframe = document.createElement("iframe");
+      iframe.src = `https://www.youtube.com/embed/${ytMatch[1]}`;
+      iframe.width = "360";
+      iframe.height = "215";
+      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+      iframe.allowFullscreen = true;
+      iframe.style.display = "block";
+      iframe.style.maxWidth = "100%";
+      iframe.style.margin = "10px 0";
+      mediaContainer.appendChild(iframe);
+    } else if (/^https?:\/\/.+\.(mp4|webm|ogg)(\?.*)?$/i.test(n.video)) {
+      // Direct video file
+      const video = document.createElement("video");
+      video.src = n.video;
+      video.controls = true;
+      video.style.display = "block";
+      video.style.maxWidth = "320px";
+      video.style.margin = "10px 0";
+      mediaContainer.appendChild(video);
+    } else {
+      // Fallback: show as link
+      const a = document.createElement("a");
+      a.href = n.video;
+      a.textContent = "Ver video";
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.style.display = "block";
+      a.style.margin = "10px 0";
+      a.style.color = "#ffd1ff";
+      mediaContainer.appendChild(a);
+    }
+  }
+  if (n.link) {
+    const a = document.createElement("a");
+    a.href = n.link;
+    a.textContent = "Enlace externo";
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.style.display = "block";
+    a.style.margin = "10px 0";
+    a.style.color = "#ffd1ff";
+    mediaContainer.appendChild(a);
+  }
+  // set spotlight coords
+  if (pointer) {
+    document.getElementById("dim").style.setProperty("--x", pointer.x + "px");
+    document.getElementById("dim").style.setProperty("--y", pointer.y + "px");
+  }
+  document.getElementById("dim").classList.add("show");
+  overlay.style.display = "flex";
+  overlay.setAttribute("aria-hidden","false");
   function closeOverlay() {
     overlay.style.display = "none";
     overlayNodeId = null;
     document.getElementById("dim").classList.remove("show");
   }
-
   saveNotesOverlayBtn.addEventListener("click", () => {
     if (!overlayNodeId) return;
     const newNotes = notesInput.value.trim();
@@ -529,59 +684,72 @@
   });
   closeOverlayBtn.addEventListener("click", closeOverlay);
   closeBtn.addEventListener("click", closeOverlay);
+}
 
-  // ---------- Create node (in constellation) ----------
-  createNodeBtn.addEventListener("click", () => {
-    const label = newNodeLabelInput.value.trim();
-    const info = newNodeInfoInput.value.trim();
-    if (!label || !info) { createMessage.textContent = "Completa título y descripción"; setTimeout(()=>createMessage.textContent="",2000); return; }
-    const notes = newNodeNotesInput.value.trim();
-    const physics = newNodePhysics.checked;
-    const fixedChecked = newNodeFixed.checked;
-    const constellation = constellationSelect.value || initialConfs[0];
-
-    // id incremental safe
-    const newId = Math.max(...(nodes.getIds().map(Number)), 0) + 1;
-
-    // position: place near constellation center with offset to visually separate groups
-    // compute constellation centers
-    const consts = Array.from(new Set(nodes.get().map(n => n.constellation)));
-    const idx = (consts.indexOf(constellation) >= 0) ? consts.indexOf(constellation) : consts.length;
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    const centerX = (0.15 + 0.7 * (idx / Math.max(1, Math.max(1,consts.length)-1))) * width;
-    const centerY = height / 2;
-    const jitter = 40 + Math.random() * 120;
-    const angle = Math.random() * Math.PI * 2;
-    const x = centerX + Math.cos(angle) * jitter;
-    const y = centerY + Math.sin(angle) * jitter;
-
-    const nodeObj = { id: newId, label, info, notes, constellation, physics: !!physics };
-    if (fixedChecked) nodeObj.fixed = { x: true, y: true }, nodeObj.x = x, nodeObj.y = y;
-    else nodeObj.x = x, nodeObj.y = y;
-
-    nodes.add(nodeObj);
-    persistAll();
-
-    newNodeLabelInput.value = ""; newNodeInfoInput.value = ""; newNodeNotesInput.value = "";
-    createMessage.textContent = `Nodo ${newId} creado en "${constellation}"`;
-    setTimeout(()=>createMessage.textContent="",1600);
-
-    // refresh select options if new constellation created earlier
-    refreshConstellationOptions();
-  });
 
   // ---------- Create new constellation button ----------
   newConstBtn.addEventListener("click", () => {
-    const name = prompt("Nombre de la nueva constelación:");
+    let name = prompt("Nombre de la nueva constelación:");
     if (!name) return;
-    // add to selection and reselect
-    // create small invisible placeholder node? not necessary; we just add option
-    const opt = document.createElement("option"); opt.value = name; opt.textContent = name;
+    name = name.trim();
+    if (!name) return;
+    // Check if already exists (case-insensitive)
+    const exists = Array.from(constellationSelect.options).some(opt => opt.value.toLowerCase() === name.toLowerCase());
+    if (exists) {
+      setMessage(createMessage, `La constelación "${name}" ya existe.`);
+      constellationSelect.value = name;
+      constellationSelect.focus();
+      return;
+    }
+    const opt = document.createElement("option");
+    opt.value = name;
+    opt.textContent = name;
     constellationSelect.appendChild(opt);
     constellationSelect.value = name;
-    setTimeout(()=>{ setMessage(storageMessage, `Constelación "${name}" creada.`); }, 50);
+    setMessage(createMessage, `Constelación "${name}" creada ✓`);
+    constellationSelect.focus();
   });
+  // Accessibility: Enter key creates node if focused in new node fields
+  [newNodeLabelInput, newNodeInfoInput, newNodeNotesInput].forEach(input => {
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        createNodeBtn.click();
+      }
+    });
+  });
+
+
+  // Keyboard shortcut: Ctrl+E toggles editor panel
+  document.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "e") {
+      e.preventDefault();
+      toggleEditorBtn.click();
+    }
+  });
+
+
+  // Improve focus ring for accessibility
+  document.body.addEventListener('keydown', function(e) {
+    if (e.key === 'Tab') {
+      document.body.classList.add('user-is-tabbing');
+    }
+  });
+  document.body.addEventListener('mousedown', function() {
+    document.body.classList.remove('user-is-tabbing');
+  });
+
+
+  // Add focus style
+  const style = document.createElement('style');
+  style.textContent = `
+    body.user-is-tabbing :focus {
+      outline: 2.5px solid #ffd1ff !important;
+      outline-offset: 2px;
+    }
+  `;
+  document.head.appendChild(style);
+
 
   function setMessage(el, txt, timeout=2000) {
     el.textContent = txt;
@@ -589,18 +757,21 @@
     setTimeout(()=>{ if (el.textContent === txt) el.textContent = ""; }, timeout);
   }
 
+
   // ---------- Connection mode (click A then B) ----------
-  let connectMode = { active: false, remove: false, source: null };
+
 
   addConnectionBtn.addEventListener("click", () => {
     connectMode = { active: true, remove: false, source: null };
     setMessage(connectionMessage, "Modo CONEXIÓN: clic en primer nodo → clic en segundo nodo", 5000);
   });
 
+
   removeConnectionBtn.addEventListener("click", () => {
     connectMode = { active: true, remove: true, source: null };
     setMessage(connectionMessage, "Modo BORRAR CONEXIÓN: clic en primer nodo → clic en segundo nodo", 5000);
   });
+
 
   // intercept clicks to implement connectMode, otherwise default to opening overlay
   network.on("click", params => {
@@ -634,9 +805,11 @@
       return; // stop further handling (avoid overlay focus)
     }
 
+
     // else -- if it's a node click open overlay (we already have network.on('selectNode') opening overlay)
     // default behavior handled elsewhere
   });
+
 
   // ---------- prevent auto-zoom loops ----------
   // We avoid calling network.focus or network.fit when creating nodes or edges.
@@ -647,6 +820,7 @@
     initialFitted = true;
   }
 
+
   // ---------- Export / Import / Reset ----------
   exportBtn.addEventListener("click", () => {
     const payload = { nodes: nodes.get(), edges: edges.get() };
@@ -656,31 +830,113 @@
     URL.revokeObjectURL(url);
   });
 
+
   importBtn.addEventListener("click", () => {
     const txt = prompt("Pegar JSON exportado:");
     if (!txt) return;
+    let parsed;
     try {
-      const parsed = JSON.parse(txt);
-      if (Array.isArray(parsed.nodes) && Array.isArray(parsed.edges)) {
-        nodes.clear(); edges.clear();
-        // normalize nodes
-        const normNodes = parsed.nodes.map(n => {
-          const copy = { ...n };
-          if (copy.fixed === true) copy.fixed = { x: true, y: true };
-          return copy;
-        });
-        nodes.add(normNodes);
-        edges.add(parsed.edges);
-        persistAll();
-        refreshConstellationOptions();
-        setMessage(storageMessage, "Importación OK", 2000);
-      } else {
-        setMessage(storageMessage, "JSON inválido", 2400);
-      }
+      parsed = JSON.parse(txt);
     } catch (e) {
       setMessage(storageMessage, "Error parseando JSON", 2400);
+      return;
     }
+    if (!parsed || !Array.isArray(parsed.nodes) || !Array.isArray(parsed.edges)) {
+      setMessage(storageMessage, "JSON inválido", 2400);
+      return;
+    }
+
+
+    const modeInput = prompt("Escribí 'agregar' para sumar al mapa actual o 'reemplazar' para sobrescribir. (Cancelar para abortar)");
+    if (modeInput === null) {
+      setMessage(storageMessage, "Importación cancelada", 1600);
+      return;
+    }
+    const mode = modeInput.trim().toLowerCase();
+    if (mode !== "agregar" && mode !== "reemplazar") {
+      setMessage(storageMessage, "Modo inválido. Usá 'agregar' o 'reemplazar'.", 2400);
+      return;
+    }
+
+
+    const normNodes = parsed.nodes.map(n => {
+      const copy = { ...n };
+      if (copy.fixed === true) copy.fixed = { x: true, y: true };
+      return copy;
+    });
+    const normEdges = parsed.edges.map(e => ({ ...e }));
+
+
+    if (mode === "reemplazar") {
+      nodes.clear();
+      edges.clear();
+      nodes.add(normNodes);
+      edges.add(normEdges);
+      persistAll();
+      refreshConstellationOptions();
+      ensureGroupSeparation();
+      setMessage(storageMessage, "Importación (reemplazo) OK", 2200);
+      return;
+    }
+
+
+    const existingNodeIds = new Set(nodes.getIds());
+    const usedNodeIds = new Set(existingNodeIds);
+    const idMap = new Map();
+
+
+    function makeUniqueId(originalId) {
+      let base = originalId;
+      if (base == null || base === "") {
+        base = `node_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+      }
+      if (!usedNodeIds.has(base)) {
+        usedNodeIds.add(base);
+        return base;
+      }
+      const sanitized = String(base).replace(/\s+/g, "_");
+      let counter = 1;
+      let candidate = sanitized;
+      while (usedNodeIds.has(candidate)) {
+        candidate = `${sanitized}_${counter}`;
+        counter += 1;
+      }
+      usedNodeIds.add(candidate);
+      return candidate;
+    }
+
+
+    const nodesToAdd = normNodes.map(node => {
+      let desiredId = node.id;
+      if (desiredId == null || desiredId === "" || usedNodeIds.has(desiredId)) {
+        desiredId = makeUniqueId(desiredId);
+      } else {
+        usedNodeIds.add(desiredId);
+      }
+      if (node.id != null && node.id !== desiredId) {
+        idMap.set(node.id, desiredId);
+      }
+      return { ...node, id: desiredId };
+    });
+
+
+    const edgesToAdd = normEdges.map(edge => {
+      const mappedFrom = idMap.has(edge.from) ? idMap.get(edge.from) : edge.from;
+      const mappedTo = idMap.has(edge.to) ? idMap.get(edge.to) : edge.to;
+      const copy = { ...edge, from: mappedFrom, to: mappedTo };
+      delete copy.id;
+      return copy;
+    });
+
+
+    nodes.add(nodesToAdd);
+    edges.add(edgesToAdd);
+    persistAll();
+    refreshConstellationOptions();
+    ensureGroupSeparation();
+    setMessage(storageMessage, `Importación agregada (${nodesToAdd.length} nodos, ${edgesToAdd.length} enlaces)`, 2800);
   });
+
 
   resetBtn.addEventListener("click", () => {
     if (!confirm("¿Borrar todo y volver al estado inicial?")) return;
@@ -688,11 +944,10 @@
     location.reload();
   });
 
+
   // ---------- utility: clicking empty area deselects and closes overlay ----------
-  container.addEventListener("click", (ev) => {
-    // clicking background already handled by vis; but close overlay if clicked outside nodes
-    // We guard so click on control elements don't trigger.
-  });
+  // (No handler needed: vis.js already handles background clicks appropriately)
+
 
   // ---------- small particle background (kept original) ----------
   const canvas = document.getElementById("particles");
@@ -708,6 +963,7 @@
   resizeCanvas();
   window.addEventListener("resize", resizeCanvas);
 
+
   const N = 90;
   const parts = new Array(N).fill(0).map(() => ({
     x: Math.random() * canvas.width,
@@ -716,6 +972,7 @@
     vy: (Math.random() - 0.5) * 0.14 * DPR,
     r: (Math.random() * 1.2 + 0.6) * DPR
   }));
+
 
   function tick() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -741,6 +998,7 @@
   }
   tick();
 
+
   // ---------- keyboard support: Esc to cancel connect mode and close overlay ----------
   document.addEventListener("keydown", e=> {
     if (e.key === "Escape") {
@@ -749,118 +1007,19 @@
     }
   });
 
+
   // ---------- On first load, ensure constellations menu reflects groups present ----------
   refreshConstellationOptions();
 
+
   // done
   console.log("Constelaciones cargadas. Redes listas.");
-
-  </script>
-<!-- Botón e input para importar constelaciones -->
-<input type="file" id="importFile" accept=".json" style="display:none;">
-<button id="importButton" style="
-  position:fixed;
-  top:10px;
-  right:10px;
-  z-index:1000;
-  background:rgba(0,0,0,0.6);
-  color:white;
-  border:none;
-  border-radius:12px;
-  padding:8px 14px;
-  cursor:pointer;
-  font-size:14px;
-">Importar constelación</button>
-
-<script>
-const importButton = document.getElementById("importButton");
-const importFile = document.getElementById("importFile");
-
-importButton.addEventListener("click", () => importFile.click());
-
-importFile.addEventListener("change", (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target.result);
-      loadConstellation(data);
-    } catch (err) {
-      alert("Error al leer el archivo JSON: " + err.message);
-    }
-  };
-  reader.readAsText(file);
-});
-
-function loadConstellation(data) {
-  // Elimina los nodos y líneas previas
-  document.querySelectorAll(".node, .connection, .node-label").forEach(el => el.remove());
-
-  // Accedemos al SVG existente
-  const svg = document.querySelector("svg");
-  const nodes = {};
-
-  // Crear nuevos nodos
-  data.nodos.forEach(nodo => {
-    // Crear círculo
-    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    circle.setAttribute("cx", nodo.x);
-    circle.setAttribute("cy", nodo.y);
-    circle.setAttribute("r", nodo.radio || 10);
-    circle.setAttribute("fill", nodo.color || "#ffffff");
-    circle.classList.add("node");
-    svg.appendChild(circle);
-
-    // Crear texto
-    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    text.setAttribute("x", nodo.x + 15);
-    text.setAttribute("y", nodo.y + 5);
-    text.textContent = nodo.titulo;
-    text.classList.add("node-label");
-    svg.appendChild(text);
-
-    // Guardar info para overlay y conexiones
-    nodes[nodo.titulo] = { 
-      element: circle,
-      x: nodo.x, 
-      y: nodo.y, 
-      info: nodo.info || "Sin información disponible"
-    };
-
-    // Click para mostrar overlay
-    circle.addEventListener("click", () => {
-      const overlay = document.getElementById("overlay");
-      const overlayTitle = document.getElementById("overlay-title");
-      const overlayInfo = document.getElementById("overlay-info");
-      overlayTitle.textContent = nodo.titulo;
-      overlayInfo.textContent = nodo.info || "Sin información disponible";
-      overlay.style.display = "flex";
-    });
-  });
-
-  // Crear conexiones
-  data.conexiones.forEach(([a, b]) => {
-    if (nodes[a] && nodes[b]) {
-      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      line.setAttribute("x1", nodes[a].x);
-      line.setAttribute("y1", nodes[a].y);
-      line.setAttribute("x2", nodes[b].x);
-      line.setAttribute("y2", nodes[b].y);
-      line.setAttribute("stroke", "white");
-      line.setAttribute("stroke-width", "1");
-      line.classList.add("connection");
-      svg.insertBefore(line, svg.firstChild);
-    }
-  });
-
-  // Mover nodos adelante del resto
-  document.querySelectorAll(".node").forEach(node => svg.appendChild(node));
-  document.querySelectorAll(".node-label").forEach(label => svg.appendChild(label));
-}
+});// <-- This closes the DOMContentLoaded function
 </script>
 </body>
 </html>
+
+
+
 
 
