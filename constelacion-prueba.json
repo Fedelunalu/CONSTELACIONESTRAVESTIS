@@ -1,0 +1,31 @@
+{
+  "nombre": "Constelación Travesti Prueba",
+  "nodos": [
+    {
+      "titulo": "Travestismo Cuántico",
+      "info": "Un nodo que vibra entre materia y código.",
+      "x": 200,
+      "y": 180,
+      "color": "#ff80bf"
+    },
+    {
+      "titulo": "Red Cuerpo",
+      "info": "El cuerpo como interfaz y red afectiva.",
+      "x": 400,
+      "y": 250,
+      "color": "#66ccff"
+    },
+    {
+      "titulo": "Capital Sensorial",
+      "info": "La materialidad del deseo como economía.",
+      "x": 300,
+      "y": 400,
+      "color": "#ffee33"
+    }
+  ],
+  "conexiones": [
+    ["Travestismo Cuántico", "Red Cuerpo"],
+    ["Red Cuerpo", "Capital Sensorial"],
+    ["Travestismo Cuántico", "Capital Sensorial"]
+  ]
+}
