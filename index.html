@@ -756,6 +756,111 @@
   console.log("Constelaciones cargadas. Redes listas.");
 
   </script>
+<!-- Botón e input para importar constelaciones -->
+<input type="file" id="importFile" accept=".json" style="display:none;">
+<button id="importButton" style="
+  position:fixed;
+  top:10px;
+  right:10px;
+  z-index:1000;
+  background:rgba(0,0,0,0.6);
+  color:white;
+  border:none;
+  border-radius:12px;
+  padding:8px 14px;
+  cursor:pointer;
+  font-size:14px;
+">Importar constelación</button>
+
+<script>
+const importButton = document.getElementById("importButton");
+const importFile = document.getElementById("importFile");
+
+importButton.addEventListener("click", () => importFile.click());
+
+importFile.addEventListener("change", (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      loadConstellation(data);
+    } catch (err) {
+      alert("Error al leer el archivo JSON: " + err.message);
+    }
+  };
+  reader.readAsText(file);
+});
+
+function loadConstellation(data) {
+  // Elimina los nodos y líneas previas
+  document.querySelectorAll(".node, .connection, .node-label").forEach(el => el.remove());
+
+  // Accedemos al SVG existente
+  const svg = document.querySelector("svg");
+  const nodes = {};
+
+  // Crear nuevos nodos
+  data.nodos.forEach(nodo => {
+    // Crear círculo
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", nodo.x);
+    circle.setAttribute("cy", nodo.y);
+    circle.setAttribute("r", nodo.radio || 10);
+    circle.setAttribute("fill", nodo.color || "#ffffff");
+    circle.classList.add("node");
+    svg.appendChild(circle);
+
+    // Crear texto
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", nodo.x + 15);
+    text.setAttribute("y", nodo.y + 5);
+    text.textContent = nodo.titulo;
+    text.classList.add("node-label");
+    svg.appendChild(text);
+
+    // Guardar info para overlay y conexiones
+    nodes[nodo.titulo] = { 
+      element: circle,
+      x: nodo.x, 
+      y: nodo.y, 
+      info: nodo.info || "Sin información disponible"
+    };
+
+    // Click para mostrar overlay
+    circle.addEventListener("click", () => {
+      const overlay = document.getElementById("overlay");
+      const overlayTitle = document.getElementById("overlay-title");
+      const overlayInfo = document.getElementById("overlay-info");
+      overlayTitle.textContent = nodo.titulo;
+      overlayInfo.textContent = nodo.info || "Sin información disponible";
+      overlay.style.display = "flex";
+    });
+  });
+
+  // Crear conexiones
+  data.conexiones.forEach(([a, b]) => {
+    if (nodes[a] && nodes[b]) {
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", nodes[a].x);
+      line.setAttribute("y1", nodes[a].y);
+      line.setAttribute("x2", nodes[b].x);
+      line.setAttribute("y2", nodes[b].y);
+      line.setAttribute("stroke", "white");
+      line.setAttribute("stroke-width", "1");
+      line.classList.add("connection");
+      svg.insertBefore(line, svg.firstChild);
+    }
+  });
+
+  // Mover nodos adelante del resto
+  document.querySelectorAll(".node").forEach(node => svg.appendChild(node));
+  document.querySelectorAll(".node-label").forEach(label => svg.appendChild(label));
+}
+</script>
 </body>
 </html>
+
 
